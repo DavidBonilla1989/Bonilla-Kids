@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bonilla Kids - Clothes</title>
+<style>
+body{margin:0;font-family:system-ui,Arial;background:linear-gradient(#fff0c9,#dff8ff);color:#203047}.app{max-width:900px;margin:auto;padding:14px}h1{text-align:center;font-size:clamp(30px,9vw,56px);margin:8px}.sub{text-align:center;font-size:22px;font-weight:800}.bar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:14px}button{border:0;border-radius:20px;padding:14px 16px;font-size:18px;font-weight:900;background:#ff73a6;color:white;box-shadow:0 5px 0 #0002}button:active{transform:translateY(2px)}.b{background:#42bff5}.g{background:#30b85f}.panel{background:white;border-radius:28px;text-align:center;padding:16px;margin:12px 0;box-shadow:0 8px 24px #0001}#target{font-size:clamp(34px,10vw,64px);font-weight:1000;color:#7c3aed}#msg{min-height:35px;font-size:26px;font-weight:1000}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}.card{background:white;border-radius:26px;padding:10px;text-align:center;min-height:245px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 8px 20px #0001}.emoji{font-size:84px}.word{font-size:28px;font-weight:1000}.es{font-size:17px;font-weight:800;opacity:.7}.good{color:#30b85f}.bad{color:#ef4444}@media(max-width:430px){.cards{grid-template-columns:repeat(2,1fr)}.card{min-height:220px}button{font-size:16px}}
+</style>
+</head>
+<body>
+<div class="app">
+<h1>⭐ Bonilla Kids ⭐</h1>
+<div class="sub">Let’s Learn Clothes!</div>
+<div class="bar"><button onclick="startGame()">🎲 Jugar</button><button class="b" onclick="listenAll()">🔊 Escuchar</button><button class="g" onclick="practiceMode()">👆 Practicar</button></div>
+<div class="panel"><div id="mode">Modo práctica</div><div id="target">Toca una prenda</div><div style="font-size:22px;font-weight:900">⭐ Puntos: <span id="score">0</span></div><div id="msg"></div></div>
+<section id="cards" class="cards"></section>
+</div>
+<script>
+const items=[{word:'pants',es:'pantalón',emoji:'👖'},{word:'shoes',es:'zapatos',emoji:'👟'},{word:'sweater',es:'suéter',emoji:'🧥'},{word:'T-shirt',es:'camiseta',emoji:'👕'},{word:'skirt',es:'falda',emoji:'👗'}];
+let target=null,score=Number(localStorage.getItem('score-clothes')||0);const scoreEl=document.getElementById('score');scoreEl.textContent=score;
+function speak(t){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.72;u.pitch=1.25;speechSynthesis.speak(u)}
+function msg(t,c=''){let m=document.getElementById('msg');m.className=c;m.textContent=t}
+function render(){cards.innerHTML='';items.forEach(it=>{let d=document.createElement('div');d.className='card';d.onclick=()=>choose(it);d.innerHTML=`<div class="emoji">${it.emoji}</div><div class="word">${it.word}</div><div class="es">${it.es}</div><button class="b" onclick="event.stopPropagation();speak('${it.word}')">🔊</button>`;cards.appendChild(d)})}
+function choose(it){speak(it.word);if(!target){msg('Repite: '+it.word,'good');return}if(it.word==target.word){score++;localStorage.setItem('score-clothes',score);scoreEl.textContent=score;msg('✅ Great job!','good');setTimeout(startGame,1000)}else{msg('❌ Prueba otra vez','bad');setTimeout(()=>speak(target.word),400)}}
+function startGame(){target=items[Math.floor(Math.random()*items.length)];mode.textContent='Juego: toca la imagen correcta';targetEl.textContent=target.word;msg('Escucha y toca.');speak(target.word)}
+function practiceMode(){target=null;mode.textContent='Modo práctica';targetEl.textContent='Toca una prenda';msg('Toca, escucha y repite.')}
+function listenAll(){target=null;mode.textContent='Escuchar vocabulario';let i=0;(function next(){if(i>=items.length){msg('Terminamos 👏','good');return}let it=items[i++];targetEl.textContent=it.word;msg(it.es,'good');speak(it.word);setTimeout(next,1700)})()}
+const targetEl=document.getElementById('target'),cards=document.getElementById('cards'),mode=document.getElementById('mode');render();
+</script>
+</body>
+</html>
